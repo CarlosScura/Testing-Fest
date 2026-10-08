@@ -48,13 +48,32 @@ def test_broadcast_envia_a_todos_menos_al_emisor(servidor):
 
 
 def test_broadcast_desconecta_al_cliente_que_falla(servidor, monkeypatch):
+
     # Arrange
     monkeypatch.setattr(servidor, "guardar_log", lambda mensaje: None)
     emisor, roto, sano = SocketFalso(), SocketFalso(falla=True), SocketFalso()
     servidor.clientes = {emisor: "Diana", roto: "Bruce", sano: "Clark"}
+    
     # Act
     servidor.broadcast("hola", emisor)
+    
     # Assert
     assert roto not in servidor.clientes
     assert roto.cerrado
     assert b"hola" in sano.enviados
+
+""" 
+Ahora te toca escribir el test de desconectar_cliente, 
+con los tres comportamientos que vimos 
+(sale del diccionario, queda cerrado, los demás reciben el aviso).
+"""
+
+def test_desconectar_cliente(servidor,monkeypatch):
+
+    monkeypatch.setattr(servidor, "guardar_log", lambda mensaje: None)
+    cliente1, roto, cliente2 = SocketFalso(), SocketFalso(), SocketFalso()
+    servidor.clientes = {cliente1: "Wally", roto: "Hal", cliente2: "John"}
+
+    servidor.desconectar_cliente(roto)
+
+    assert roto not in servidor.clientes
