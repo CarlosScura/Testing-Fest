@@ -49,12 +49,6 @@ tests/test_validacion.py::test_mensaje_valido_se_acepta PASSED                  
 ======================================================== 6 passed in 0.02s ========================================================
 ```
 
-## REFACTOR
-
-```
-
-```
-
 
 # Ciclo 2: mensaje vacío se rechaza
 
@@ -94,6 +88,87 @@ FAILED tests/test_validacion.py::test_mensaje_vacio_se_rechaza - Failed: DID NOT
 ## GREEN
 
 ```
+======================================================= test session starts =======================================================
+platform linux -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0 -- /home/fedev/Documentos/Proyectos/CodePro/Testing-Fest/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/fedev/Documentos/Proyectos/CodePro/Testing-Fest
+configfile: pytest.ini
+testpaths: tests
+collected 7 items                                                                                                                 
+
+tests/test_servidor.py::test_servidor_nuevo_no_tiene_clientes PASSED                                                        [ 14%]
+tests/test_servidor.py::test_broadcast_envia_a_todos_menos_al_emisor PASSED                                                 [ 28%]
+tests/test_servidor.py::test_broadcast_desconecta_al_cliente_que_falla PASSED                                               [ 42%]
+tests/test_servidor.py::test_desconectar_cliente PASSED                                                                     [ 57%]
+tests/test_servidor.py::test_desconectar_cliente_que_ya_no_esta PASSED                                                      [ 71%]
+tests/test_validacion.py::test_mensaje_valido_se_acepta PASSED                                                              [ 85%]
+tests/test_validacion.py::test_mensaje_vacio_se_rechaza PASSED                                                              [100%]
+
+======================================================== 7 passed in 0.01s ========================================================
+```
+
+
+# Ciclo 3: mensaje de solo espacios se rechaza
+
+## RED
+
+```
+======================================================= test session starts =======================================================
+platform linux -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0 -- /home/fedev/Documentos/Proyectos/CodePro/Testing-Fest/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/fedev/Documentos/Proyectos/CodePro/Testing-Fest
+configfile: pytest.ini
+testpaths: tests
+collected 8 items                                                                                                                 
+
+tests/test_servidor.py::test_servidor_nuevo_no_tiene_clientes PASSED                                                        [ 12%]
+tests/test_servidor.py::test_broadcast_envia_a_todos_menos_al_emisor PASSED                                                 [ 25%]
+tests/test_servidor.py::test_broadcast_desconecta_al_cliente_que_falla PASSED                                               [ 37%]
+tests/test_servidor.py::test_desconectar_cliente PASSED                                                                     [ 50%]
+tests/test_servidor.py::test_desconectar_cliente_que_ya_no_esta PASSED                                                      [ 62%]
+tests/test_validacion.py::test_mensaje_valido_se_acepta PASSED                                                              [ 75%]
+tests/test_validacion.py::test_mensaje_vacio_se_rechaza PASSED                                                              [ 87%]
+tests/test_validacion.py::test_mensaje_solo_espacios_se_rechaza FAILED                                                      [100%]
+
+============================================================ FAILURES =============================================================
+______________________________________________ test_mensaje_solo_espacios_se_rechaza ______________________________________________
+
+    def test_mensaje_solo_espacios_se_rechaza():
+>       with pytest.raises(MensajeInvalido):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE MensajeInvalido
+
+tests/test_validacion.py:12: Failed
+===================================================== short test summary info =====================================================
+FAILED tests/test_validacion.py::test_mensaje_solo_espacios_se_rechaza - Failed: DID NOT RAISE MensajeInvalido
+=================================================== 1 failed, 7 passed in 0.05s ===================================================
+```
+
+## GREEN
+
+```
+======================================================= test session starts =======================================================
+platform linux -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0 -- /home/fedev/Documentos/Proyectos/CodePro/Testing-Fest/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/fedev/Documentos/Proyectos/CodePro/Testing-Fest
+configfile: pytest.ini
+testpaths: tests
+collected 8 items                                                                                                                 
+
+tests/test_servidor.py::test_servidor_nuevo_no_tiene_clientes PASSED                                                        [ 12%]
+tests/test_servidor.py::test_broadcast_envia_a_todos_menos_al_emisor PASSED                                                 [ 25%]
+tests/test_servidor.py::test_broadcast_desconecta_al_cliente_que_falla PASSED                                               [ 37%]
+tests/test_servidor.py::test_desconectar_cliente PASSED                                                                     [ 50%]
+tests/test_servidor.py::test_desconectar_cliente_que_ya_no_esta PASSED                                                      [ 62%]
+tests/test_validacion.py::test_mensaje_valido_se_acepta PASSED                                                              [ 75%]
+tests/test_validacion.py::test_mensaje_vacio_se_rechaza PASSED                                                              [ 87%]
+tests/test_validacion.py::test_mensaje_solo_espacios_se_rechaza PASSED                                                      [100%]
+
+======================================================== 8 passed in 0.02s ========================================================
+```
+
+## REFACTOR
 
 ```
 
+```

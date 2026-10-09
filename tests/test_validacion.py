@@ -7,3 +7,7 @@ def test_mensaje_valido_se_acepta():
 def test_mensaje_vacio_se_rechaza():
     with pytest.raises(MensajeInvalido):
         validar_mensaje("")
+
+def test_mensaje_solo_espacios_se_rechaza():
+    with pytest.raises(MensajeInvalido):
+        validar_mensaje("   ")
