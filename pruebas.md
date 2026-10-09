@@ -167,6 +167,82 @@ tests/test_validacion.py::test_mensaje_solo_espacios_se_rechaza PASSED          
 ======================================================== 8 passed in 0.02s ========================================================
 ```
 
+# Ciclo 4: mensaje demasiado largo se rechaza
+
+## RED
+
+```
+======================================================= test session starts =======================================================
+platform linux -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0 -- /home/fedev/Documentos/Proyectos/CodePro/Testing-Fest/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/fedev/Documentos/Proyectos/CodePro/Testing-Fest
+configfile: pytest.ini
+testpaths: tests
+collected 9 items                                                                                                                 
+
+tests/test_servidor.py::test_servidor_nuevo_no_tiene_clientes PASSED                                                        [ 11%]
+tests/test_servidor.py::test_broadcast_envia_a_todos_menos_al_emisor PASSED                                                 [ 22%]
+tests/test_servidor.py::test_broadcast_desconecta_al_cliente_que_falla PASSED                                               [ 33%]
+tests/test_servidor.py::test_desconectar_cliente PASSED                                                                     [ 44%]
+tests/test_servidor.py::test_desconectar_cliente_que_ya_no_esta PASSED                                                      [ 55%]
+tests/test_validacion.py::test_mensaje_valido_se_acepta PASSED                                                              [ 66%]
+tests/test_validacion.py::test_mensaje_vacio_se_rechaza PASSED                                                              [ 77%]
+tests/test_validacion.py::test_mensaje_solo_espacios_se_rechaza PASSED                                                      [ 88%]
+tests/test_validacion.py::test_mensaje_demasiado_largo_se_rechaza FAILED                                                    [100%]
+
+============================================================ FAILURES =============================================================
+_____________________________________________ test_mensaje_demasiado_largo_se_rechaza _____________________________________________
+
+    def test_mensaje_demasiado_largo_se_rechaza():
+>       with pytest.raises(MensajeInvalido):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE MensajeInvalido
+
+tests/test_validacion.py:16: Failed
+===================================================== short test summary info =====================================================
+FAILED tests/test_validacion.py::test_mensaje_demasiado_largo_se_rechaza - Failed: DID NOT RAISE MensajeInvalido
+=================================================== 1 failed, 8 passed in 0.05s ===================================================
+```
+
+## GREEN
+
+```
+======================================================= test session starts =======================================================
+platform linux -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0 -- /home/fedev/Documentos/Proyectos/CodePro/Testing-Fest/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/fedev/Documentos/Proyectos/CodePro/Testing-Fest
+configfile: pytest.ini
+testpaths: tests
+collected 9 items                                                                                                                 
+
+tests/test_servidor.py::test_servidor_nuevo_no_tiene_clientes PASSED                                                        [ 11%]
+tests/test_servidor.py::test_broadcast_envia_a_todos_menos_al_emisor PASSED                                                 [ 22%]
+tests/test_servidor.py::test_broadcast_desconecta_al_cliente_que_falla PASSED                                               [ 33%]
+tests/test_servidor.py::test_desconectar_cliente PASSED                                                                     [ 44%]
+tests/test_servidor.py::test_desconectar_cliente_que_ya_no_esta PASSED                                                      [ 55%]
+tests/test_validacion.py::test_mensaje_valido_se_acepta PASSED                                                              [ 66%]
+tests/test_validacion.py::test_mensaje_vacio_se_rechaza PASSED                                                              [ 77%]
+tests/test_validacion.py::test_mensaje_solo_espacios_se_rechaza PASSED                                                      [ 88%]
+tests/test_validacion.py::test_mensaje_demasiado_largo_se_rechaza PASSED                                                    [100%]
+
+======================================================== 9 passed in 0.01s ========================================================
+```
+
+
+# Ciclo 5: 
+
+## RED
+
+```
+
+```
+
+## GREEN
+
+```
+
+```
+
 ## REFACTOR
 
 ```
