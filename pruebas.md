@@ -251,23 +251,3 @@ tests/test_validacion.py::test_mensaje_demasiado_largo_se_rechaza PASSED        
 
 ======================================================== 9 passed in 0.01s ========================================================
 ```
-
-# Ciclo 5: 
-
-## RED
-
-```
-
-```
-
-## GREEN
-
-```
-
-```
-
-## REFACTOR
-
-```
-
-```
