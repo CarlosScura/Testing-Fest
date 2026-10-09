@@ -1,6 +1,8 @@
 import pytest
 from validacion import validar_mensaje, MensajeInvalido
 
+MAX_LARGO = 300
+
 def test_mensaje_valido_se_acepta():
     assert validar_mensaje("hola") == "hola"
 
@@ -14,4 +16,4 @@ def test_mensaje_solo_espacios_se_rechaza():
 
 def test_mensaje_demasiado_largo_se_rechaza():
     with pytest.raises(MensajeInvalido):
-        validar_mensaje("a" * 301)
+        validar_mensaje("a" * (MAX_LARGO+1) )
