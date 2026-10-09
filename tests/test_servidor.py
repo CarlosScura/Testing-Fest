@@ -62,11 +62,6 @@ def test_broadcast_desconecta_al_cliente_que_falla(servidor, monkeypatch):
     assert roto.cerrado
     assert b"hola" in sano.enviados
 
-""" 
-Ahora te toca escribir el test de desconectar_cliente, 
-con los tres comportamientos que vimos 
-(sale del diccionario, queda cerrado, los demás reciben el aviso).
-"""
 
 def test_desconectar_cliente(servidor,monkeypatch):
 
@@ -77,3 +72,22 @@ def test_desconectar_cliente(servidor,monkeypatch):
     servidor.desconectar_cliente(roto)
 
     assert roto not in servidor.clientes
+
+
+def test_desconectar_cliente_que_ya_no_esta(servidor, monkeypatch):
+    
+    # Arrange
+    monkeypatch.setattr(servidor, "guardar_log", lambda mensaje: None)
+    cliente1, cliente2, ausente = SocketFalso(), SocketFalso(), SocketFalso()
+    servidor.clientes = {cliente1: "Wally", cliente2: "John"}
+    # `ausente` nunca se agregó al diccionario, así que "ya no está"
+
+    # Act
+    servidor.desconectar_cliente(ausente)
+
+    # Assert
+    assert ausente not in servidor.clientes
+    assert len(servidor.clientes) == 2
+    assert not ausente.cerrado
+    assert cliente1.enviados == []
+    assert cliente2.enviados == []
