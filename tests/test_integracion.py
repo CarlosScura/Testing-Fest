@@ -109,3 +109,41 @@ def test_varios_mensajes_llegan_en_orden_sin_perderse(servidor_real):
             assert recibido.count("Dinah: dos") == 1
             assert recibido.count("Dinah: tres") == 1
             assert recibido.index("Dinah: uno") < recibido.index("Dinah: dos") < recibido.index("Dinah: tres")
+
+
+def test_varios_clientes_envian_a_la_vez(servidor_real):
+    puerto = servidor_real.server_socket.getsockname()[1]
+    nombres = ["Diana", "Bruce", "Clark"]
+    clientes = {}
+    try:
+        for nombre in nombres:
+            cliente = socket.create_connection(("127.0.0.1", puerto), timeout=2)
+            cliente.recv(1024)
+            cliente.send(nombre.encode())
+            clientes[nombre] = cliente
+
+        for cliente in clientes.values():
+            leer_todo(cliente)
+
+        largada = threading.Barrier(len(nombres))
+
+        def enviar(nombre):
+            largada.wait()
+            clientes[nombre].send(f"mensaje de {nombre}".encode())
+
+        hilos = [threading.Thread(target=enviar, args=(n,)) for n in nombres]
+        for hilo in hilos:
+            hilo.start()
+        for hilo in hilos:
+            hilo.join()
+
+        for nombre, cliente in clientes.items():
+            recibido = leer_todo(cliente)
+            for otro in nombres:
+                if otro == nombre:
+                    assert f"{otro}: mensaje de {otro}" not in recibido
+                else:
+                    assert recibido.count(f"{otro}: mensaje de {otro}") == 1
+    finally:
+        for cliente in clientes.values():
+            cliente.close()
