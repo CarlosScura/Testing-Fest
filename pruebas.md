@@ -10,6 +10,17 @@
     4. *Causa:* TCP es un flujo de bytes sin límites entre mensajes, y el servidor lee con `recv(1024)` sin separar.
     5. *Decisión:* el test se marca como `xfail`, y el arreglo (delimitador `\n` y buffer por cliente, en servidor y cliente) queda para los requerimientos opcionales.
 
+# Prueba de integración: varios clientes envían a la vez
+
+Test: `test_varios_clientes_envian_a_la_vez`
+
+1. *Qué se probó:* tres clientes (Clark, Bruce y Diana) envían un mensaje cada uno al mismo tiempo, usando un hilo por cliente y una `threading.Barrier` para que salgan juntos. Cada cliente debe recibir el mensaje de los otros dos exactamente una vez, y nunca el propio.
+2. *Resultado:* el test pasó con el servidor original.
+3. *Comprobación de que el test puede fallar:* en `recibir_mensaje` cambié el emisor del `broadcast` a `None`, para que el servidor le mande el mensaje a todos, incluido el emisor. El test falló en `assert 'Diana: mensaje de Diana' not in ...`, porque Diana recibió su propio mensaje. Después deshice el cambio y volvió a pasar.
+4. *Observación:* la salida del fallo mostró los tres mensajes pegados en una sola cadena: `[18:04] Clark: mensaje de Clark[18:04] Bruce: mensaje de Bruce[18:04] Diana: mensaje de Diana`. Es la misma causa del hallazgo de `test_varios_mensajes_llegan_en_orden_sin_perderse`: TCP no conserva los límites entre mensajes y el `recv(1024)` los lee juntos. El test no depende de eso porque cuenta cuántas veces aparece cada mensaje (`count`) en lo recibido y no compara contra mensajes separados.
+5. *Decisión:* el test queda como está. El arreglo del protocolo (delimitador `\n` y buffer por cliente) sigue pendiente para los requerimientos opcionales.
+
+
 # Ciclo 1: mensaje válido se acepta
 
 ## RED
