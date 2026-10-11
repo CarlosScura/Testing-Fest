@@ -1,4 +1,16 @@
-# Ciclo 1: : mensaje válido se acepta
+# Hallazgos durante los tests:
+
+- El `log.txt` se escribe durante los tests de integración, por una carrera entre el hilo del servidor y el final del test.
+- El servidor acepta clientes con nombre vacío.
+- Problema de `test_varios_mensajes_llegan_en_orden_sin_perderse`:
+    1. *Qué se probó:* Dinah envía tres mensajes seguidos y Oliver debería recibirlos separados, una vez cada uno y en orden.
+    2. *Resultado esperado y obtenido:* Oliver recibió `[12:22] Dinah: uno[12:22] Dinah: dostres`.
+    3. *Corridas:* el test falló en las tres, y los mensajes dos y tres llegaron juntos las tres veces. 
+        Esto puede variar dependiendo de la velocidad de la maquina en la que corren los tests.
+    4. *Causa:* TCP es un flujo de bytes sin límites entre mensajes, y el servidor lee con `recv(1024)` sin separar.
+    5. *Decisión:* el test se marca como `xfail`, y el arreglo (delimitador `\n` y buffer por cliente, en servidor y cliente) queda para los requerimientos opcionales.
+
+# Ciclo 1: mensaje válido se acepta
 
 ## RED
 
