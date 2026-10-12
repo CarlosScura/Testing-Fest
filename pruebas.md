@@ -8,7 +8,12 @@
     3. *Corridas:* el test falló en las tres, y los mensajes dos y tres llegaron juntos las tres veces. 
         Esto puede variar dependiendo de la velocidad de la maquina en la que corren los tests.
     4. *Causa:* TCP es un flujo de bytes sin límites entre mensajes, y el servidor lee con `recv(1024)` sin separar.
-    5. *Decisión:* el test se marca como `xfail`, y el arreglo (delimitador `\n` y buffer por cliente, en servidor y cliente) queda para los requerimientos opcionales.
+    5. *Decisión:* el test se marca como `xfail`, y el arreglo (delimitador `\n` y buffer por cliente, en servidor y cliente) queda para los requerimientos opcionales.  
+- Un cliente que se conecta y no envía su nombre bloquea al servidor:
+    1. *Qué se observó:* en `aceptar_conexion`, el servidor pone el socket del cliente nuevo en modo bloqueante y hace `recv` esperando el nombre, sin pasar por el selector y sin límite de tiempo.
+    2. *Consecuencia:* mientras ese cliente no escriba nada ni cierre, el servidor no atiende a nadie más. Con un solo hilo, un bloqueo ahí frena todo.
+    3. *Cómo se identificó:* leyendo el código; no hay un test que lo reproduzca.
+    4. *Decisión:* queda como mejora posible para los requerimientos opcionales (por ejemplo, un `timeout` en esa espera o registrar al cliente en el selector antes de pedirle el nombre).
 
 # Prueba de integración: varios clientes envían a la vez
 
@@ -19,6 +24,7 @@ Test: `test_varios_clientes_envian_a_la_vez`
 3. *Comprobación de que el test puede fallar:* en `recibir_mensaje` cambié el emisor del `broadcast` a `None`, para que el servidor le mande el mensaje a todos, incluido el emisor. El test falló en `assert 'Diana: mensaje de Diana' not in ...`, porque Diana recibió su propio mensaje. Después deshice el cambio y volvió a pasar.
 4. *Observación:* la salida del fallo mostró los tres mensajes pegados en una sola cadena: `[18:04] Clark: mensaje de Clark[18:04] Bruce: mensaje de Bruce[18:04] Diana: mensaje de Diana`. Es la misma causa del hallazgo de `test_varios_mensajes_llegan_en_orden_sin_perderse`: TCP no conserva los límites entre mensajes y el `recv(1024)` los lee juntos. El test no depende de eso porque cuenta cuántas veces aparece cada mensaje (`count`) en lo recibido y no compara contra mensajes separados.
 5. *Decisión:* el test queda como está. El arreglo del protocolo (delimitador `\n` y buffer por cliente) sigue pendiente para los requerimientos opcionales.
+
 
 
 # Ciclo 1: mensaje válido se acepta

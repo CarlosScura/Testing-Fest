@@ -1,7 +1,9 @@
 import socket
 import threading
 import pytest
+import time
 from servidor import server
+
 
 @pytest.fixture
 def servidor_real(monkeypatch):
@@ -162,13 +164,46 @@ def test_cliente_que_se_va_no_afecta_a_los_demas(servidor_real):
         for cliente in clientes.values():
             leer_todo(cliente)
 
-        clientes["Jay"].close()  # Caro se va
+        clientes["Jay"].close()  # Jay se va
         leer_todo(clientes["Barry"])   # vacía el aviso de salida
         leer_todo(clientes["Wally"])
 
         clientes["Barry"].send(b"hola")
 
         assert "Barry: hola" in leer_todo(clientes["Wally"])
+    finally:
+        for cliente in clientes.values():
+            cliente.close()
+
+
+def esperar_hasta(condicion, tiempo=2):
+    limite = time.time() + tiempo
+    while time.time() < limite:
+        if condicion():
+            return True
+        time.sleep(0.01)
+    return False
+
+def test_al_irse_un_cliente_los_demas_reciben_aviso_y_sale_de_la_lista(servidor_real):
+    puerto = servidor_real.server_socket.getsockname()[1]
+    clientes = {}
+    try:
+        for nombre in ["Barry", "Wally", "Jay"]:
+            cliente = socket.create_connection(("127.0.0.1", puerto), timeout=2)
+            cliente.recv(1024)
+            cliente.send(nombre.encode())
+            clientes[nombre] = cliente
+
+        for cliente in clientes.values():
+            leer_todo(cliente)
+
+        clientes["Jay"].close()
+
+        # esperamos a que el servidor se entere de la salida
+        assert esperar_hasta(lambda: "Jay" not in list(servidor_real.clientes.values()))
+
+        assert "Jay abandonó el chat." in leer_todo(clientes["Barry"])
+        assert "Jay abandonó el chat." in leer_todo(clientes["Wally"])
     finally:
         for cliente in clientes.values():
             cliente.close()
