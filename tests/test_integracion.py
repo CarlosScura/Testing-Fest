@@ -2,6 +2,7 @@ import socket
 import threading
 import pytest
 import time
+import struct
 from servidor import server
 
 
@@ -204,6 +205,37 @@ def test_al_irse_un_cliente_los_demas_reciben_aviso_y_sale_de_la_lista(servidor_
 
         assert "Jay abandonó el chat." in leer_todo(clientes["Barry"])
         assert "Jay abandonó el chat." in leer_todo(clientes["Wally"])
+    finally:
+        for cliente in clientes.values():
+            cliente.close()
+
+
+def test_caida_abrupta_no_afecta_a_los_demas(servidor_real):
+    puerto = servidor_real.server_socket.getsockname()[1]
+    clientes = {}
+    try:
+        for nombre in ["Barry", "Wally", "Jay"]:
+            cliente = socket.create_connection(("127.0.0.1", puerto), timeout=2)
+            cliente.recv(1024)
+            cliente.send(nombre.encode())
+            clientes[nombre] = cliente
+
+        for cliente in clientes.values():
+            leer_todo(cliente)
+
+        # Barry se cae de golpe: SO_LINGER con tiempo 0 hace que close() envíe un reset
+        clientes["Barry"].setsockopt(
+            socket.SOL_SOCKET, socket.SO_LINGER, struct.pack("ii", 1, 0)
+        )
+        clientes["Barry"].close()
+
+        assert esperar_hasta(lambda: "Barry" not in list(servidor_real.clientes.values()))
+        assert "Barry abandonó el chat." in leer_todo(clientes["Wally"])
+        assert "Barry abandonó el chat." in leer_todo(clientes["Jay"])
+
+        # el servidor sigue funcionando
+        clientes["Wally"].send(b"sigo aca")
+        assert "Wally: sigo aca" in leer_todo(clientes["Jay"])
     finally:
         for cliente in clientes.values():
             cliente.close()
