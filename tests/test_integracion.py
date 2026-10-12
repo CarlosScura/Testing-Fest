@@ -147,3 +147,28 @@ def test_varios_clientes_envian_a_la_vez(servidor_real):
     finally:
         for cliente in clientes.values():
             cliente.close()
+
+
+def test_cliente_que_se_va_no_afecta_a_los_demas(servidor_real):
+    puerto = servidor_real.server_socket.getsockname()[1]
+    clientes = {}
+    try:
+        for nombre in ["Barry", "Wally", "Jay"]:
+            cliente = socket.create_connection(("127.0.0.1", puerto), timeout=2)
+            cliente.recv(1024)
+            cliente.send(nombre.encode())
+            clientes[nombre] = cliente
+
+        for cliente in clientes.values():
+            leer_todo(cliente)
+
+        clientes["Jay"].close()  # Caro se va
+        leer_todo(clientes["Barry"])   # vacía el aviso de salida
+        leer_todo(clientes["Wally"])
+
+        clientes["Barry"].send(b"hola")
+
+        assert "Barry: hola" in leer_todo(clientes["Wally"])
+    finally:
+        for cliente in clientes.values():
+            cliente.close()
