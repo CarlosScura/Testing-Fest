@@ -239,3 +239,47 @@ def test_caida_abrupta_no_afecta_a_los_demas(servidor_real):
     finally:
         for cliente in clientes.values():
             cliente.close()
+
+
+def test_varias_caidas_abruptas_seguidas(servidor_real):
+    puerto = servidor_real.server_socket.getsockname()[1]
+    clientes = {}
+    try:
+        for nombre in ["Diana", "Bruce", "Clark"]:
+            cliente = socket.create_connection(("127.0.0.1", puerto), timeout=2)
+            cliente.recv(1024)
+            cliente.send(nombre.encode())
+            clientes[nombre] = cliente
+
+        for cliente in clientes.values():
+            leer_todo(cliente)
+
+        # Bruce y Clark se caen de golpe, uno justo después del otro
+        for nombre in ["Bruce", "Clark"]:
+            clientes[nombre].setsockopt(
+                socket.SOL_SOCKET, socket.SO_LINGER, struct.pack("ii", 1, 0)
+            )
+            clientes[nombre].close()
+
+        assert esperar_hasta(
+            lambda: list(servidor_real.clientes.values()) == ["Diana"]
+        )
+
+        avisos = leer_todo(clientes["Diana"])
+        assert avisos.count("Bruce abandonó el chat.") == 1
+        assert avisos.count("Clark abandonó el chat.") == 1
+
+        # el servidor sigue vivo: entra un cliente nuevo y recibe mensajes
+        jonn = socket.create_connection(("127.0.0.1", puerto), timeout=2)
+        clientes["Jonn"] = jonn
+        jonn.recv(1024)
+        jonn.send(b"Jonn")
+        # tambien puede ser leer_todo(jonn) porque tenemos su variable sola
+        leer_todo(clientes["Jonn"])
+        leer_todo(clientes["Diana"])
+
+        clientes["Diana"].send(b"hola")
+        assert "Diana: hola" in leer_todo(jonn)
+    finally:
+        for cliente in clientes.values():
+            cliente.close()

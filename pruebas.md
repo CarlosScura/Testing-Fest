@@ -25,7 +25,15 @@ Test: `test_varios_clientes_envian_a_la_vez`
 4. *Observación:* la salida del fallo mostró los tres mensajes pegados en una sola cadena: `[18:04] Clark: mensaje de Clark[18:04] Bruce: mensaje de Bruce[18:04] Diana: mensaje de Diana`. Es la misma causa del hallazgo de `test_varios_mensajes_llegan_en_orden_sin_perderse`: TCP no conserva los límites entre mensajes y el `recv(1024)` los lee juntos. El test no depende de eso porque cuenta cuántas veces aparece cada mensaje (`count`) en lo recibido y no compara contra mensajes separados.
 5. *Decisión:* el test queda como está. El arreglo del protocolo (delimitador `\n` y buffer por cliente) sigue pendiente para los requerimientos opcionales.
 
+# Prueba de integración: varias caídas abruptas seguidas
 
+Test: `test_varias_caidas_abruptas_seguidas`
+
+1. *Qué se probó:* tres clientes (Diana, Bruce y Clark) se conectan, y Bruce y Clark se caen de golpe, uno justo después del otro, con un reset de conexión (`SO_LINGER` con tiempo 0). Diana tiene que recibir un aviso de cada uno, exactamente una vez, y el servidor tiene que seguir funcionando: un cliente nuevo (Jonn) se conecta y recibe un mensaje de Diana.
+2. *Resultado:* el test pasó con el servidor original.
+3. *Comprobación de que el test puede fallar:* en `desconectar_cliente` comenté el `if cliente_socket not in self.clientes: return`. Falló `test_desconectar_cliente_que_ya_no_esta` (el test unitario), con `assert not True` en `ausente.cerrado`. El test de integración siguió pasando.
+4. *Observación:* sin esa protección, la segunda llamada para un cliente ya borrado no avisa ni borra nada de nuevo, porque el resto de la función está dentro de otro `if`. Lo único que hace de más es llamar otra vez a `close()`, y cerrar dos veces un socket real no da error. Por eso solo el test unitario, que usa un socket falso con un atributo `cerrado`, lo detecta. Cada tipo de test protege algo distinto: el unitario ve efectos internos y el de integración ve lo que vería un cliente real.
+5. *Decisión:* el test queda como está. La protección se mantiene en el código y está sostenida por el test unitario.
 
 # Ciclo 1: mensaje válido se acepta
 
