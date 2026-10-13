@@ -288,3 +288,34 @@ tests/test_validacion.py::test_mensaje_demasiado_largo_se_rechaza PASSED        
 
 ======================================================== 9 passed in 0.01s ========================================================
 ```
+
+# COBERTURA
+
+## cliente.py quedó fuera de la cobertura.
+
+```
+======================================================================== test session starts =========================================================================
+platform linux -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0
+rootdir: /home/carlos/Documentos/Penguin/CodePRO/Testing Fest/Testing-Fest
+configfile: pytest.ini
+testpaths: tests
+plugins: cov-7.1.0
+collected 19 items                                                                                                                                                   
+
+tests/test_integracion.py ....x.....                                                                                                                           [ 52%]
+tests/test_servidor.py .....                                                                                                                                   [ 78%]
+tests/test_validacion.py ....                                                                                                                                  [100%]
+
+=========================================================================== tests coverage ===========================================================================
+__________________________________________________________ coverage: platform linux, python 3.13.15-final-0 __________________________________________________________
+
+Name            Stmts   Miss  Cover   Missing
+---------------------------------------------
+servidor.py        86     12    86%   23-24, 127-137, 140-141
+validacion.py       9      0   100%
+---------------------------------------------
+TOTAL              95     12    87%
+=================================================================== 18 passed, 1 xfailed in 16.64s ===================================================================
+
+
+```
