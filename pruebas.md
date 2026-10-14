@@ -319,3 +319,22 @@ TOTAL              95     12    87%
 
 
 ```
+
+# Cobertura de código
+
+Comando: `pytest --cov=servidor --cov=validacion --cov-report=term-missing`
+
+1. *Qué se midió:* qué porcentaje de las líneas de `servidor.py` y `validacion.py` ejecutan los tests. `cliente.py` y `conexion.py` quedaron fuera de la medición: `cliente.py` no tiene tests propios y `conexion.py` solo define constantes.
+2. *Resultado:* 87% en total, por encima de la meta del 80%.
+
+    | Archivo | Líneas | Sin cubrir | Cobertura | Líneas sin cubrir |
+    |---|---|---|---|---|
+    | `servidor.py` | 86 | 12 | 86% | 23-24, 127-137, 140-141 |
+    | `validacion.py` | 9 | 0 | 100% | — |
+    | **Total** | 95 | 12 | 87% | |
+
+3. *Qué quedó sin cubrir y por qué:*
+    - Líneas 23-24: el caso de puerto ocupado en `establecer_conexion` (termina con `SystemExit`). Los tests usan el puerto `0`, que el sistema asigna libre, así que ese camino nunca se activa.
+    - Líneas 127-141: el método `iniciar` y el bloque `if __name__ == "__main__"`. Los tests importan el archivo y llaman a `establecer_conexion` y `revisar_selectores` por separado, así que el arranque del programa no se ejecuta. Probarlo exigiría lanzar el servidor como proceso aparte, y el esfuerzo no compensa.
+4. *Observación:* la cobertura mide qué líneas se ejecutaron, no si el resultado se verificó. Un ejemplo de este proyecto: con un solo test del borde del límite, la línea `len(texto) > MAX_LARGO` figuraría cubierta aunque estuviera escrita `>=` y rechazara mensajes de exactamente 300 caracteres. Por eso el número no reemplaza la revisión de los asserts.
+5. *Decisión:* se mantiene el 87% sin sumar tests solo para subir el número.
