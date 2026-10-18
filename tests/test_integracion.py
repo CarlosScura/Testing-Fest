@@ -89,7 +89,7 @@ def leer_todo(cliente, espera=0.5):
         pass
     return datos.decode()
 
-@pytest.mark.xfail(reason="El servidor fusiona mensjaes consecutivos: recv(1024) no separa mensajes (ver pruebas.md)", strict=False)
+@pytest.mark.xfail(reason="El servidor fusiona mensajes consecutivos: recv(1024) no separa mensajes (ver pruebas.md)", strict=False)
 def test_varios_mensajes_llegan_en_orden_sin_perderse(servidor_real):
     puerto = servidor_real.server_socket.getsockname()[1]
     with socket.create_connection(("127.0.0.1", puerto), timeout=2) as dinah:
